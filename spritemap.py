@@ -1,7 +1,5 @@
 from PIL import Image, ImageTk
 
-# test comment
-
 
 class Sprite:
     def __init__(self, index, filepath):
