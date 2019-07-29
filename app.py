@@ -5,7 +5,6 @@ from PIL import Image, ImageTk
 import math
 
 # VARIABLES TO EDIT (In the future these will be GUI options)
-
 # Number of tiles
 grid_count = 10
 
@@ -72,8 +71,7 @@ def reset_grid(canvas):
 def generate_map(canvas):
     # Generates a tilemap from the spritemap
     global tilemap
-    tilemap = dungeon_generation.generate_tilemap(grid_count, spritemap)
-    display_tilemap(canvas, tilemap)
+    tilemap = dungeon_generation.generate_tilemap(grid_count, spritemap, canvas)
     reset_grid(canvas)
 
 
@@ -83,22 +81,27 @@ def display_tilemap(canvas, tilemap):
     # Loop through every tile
     for y in range(grid_count):
         for x in range(grid_count):
-            # Open the sprite we are going to load to the canvas
-            image = Image.open(
-                tilemap.spritemap.sprites[tilemap.tiles[y * grid_count + x].sprite].filepath)
-            # Resize the sprite to the grid size
-            image = image.resize(
-                (math.ceil(grid_size), math.ceil(grid_size)), Image.NEAREST)
-            # Create a copy of the PhotoImage on the tile so that it does not get garbage collected. Without this the image will not show on the canvas
-            tilemap.tiles[y * grid_count +
-                          x].photoimg = ImageTk.PhotoImage(image)
-
-            # Place the image onto the canvas
-            canvas.create_image(x*grid_size+2+grid_size/2,
-                                y*grid_size+2+grid_size/2,
-                                image=tilemap.tiles[y *
-                                                    grid_count + x].photoimg
-                                )
+            display_tile(canvas, tilemap, x, y)
 
 
-main()
+def display_tile(canvas, tilemap, x, y):
+    # Displays a single tile
+    # Open the sprite we are going to load to the canvas
+    image = Image.open(
+        tilemap.spritemap.sprites[tilemap.tiles[y * grid_count + x].sprite].filepath)
+    # Resize the sprite to the grid size
+    image = image.resize(
+        (math.ceil(grid_size), math.ceil(grid_size)), Image.NEAREST)
+    # Create a copy of the PhotoImage on the tile so that it does not get garbage collected. Without this the image will not show on the canvas
+    tilemap.tiles[y * grid_count +
+                  x].photoimg = ImageTk.PhotoImage(image)
+
+    # Place the image onto the canvas
+    canvas.create_image(x*grid_size+2+grid_size/2,
+                        y*grid_size+2+grid_size/2,
+                        image=tilemap.tiles[y *
+                                            grid_count + x].photoimg
+                        )
+
+if __name__ == "__main__":
+    main()

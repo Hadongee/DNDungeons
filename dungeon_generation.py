@@ -1,5 +1,7 @@
 import spritemap
 import random
+import app
+from tkinter import *  # pylint: disable=unused-wildcard-import
 
 
 class Tile:
@@ -53,47 +55,53 @@ def get_possible_placements(tilemap):
 
     # Get every undecided tile
     for tile in get_decided(False, tilemap.tiles):
-        # Store each side in temporary variables
-        right_tile = tilemap.get_tile(tile.x+1, tile.y)
-        left_tile = tilemap.get_tile(tile.x-1, tile.y)
-        up_tile = tilemap.get_tile(tile.x, tile.y+1)
-        down_tile = tilemap.get_tile(tile.x, tile.y-1)
-
-        # Check each side to see if the it has been decided
-        # If said side has been decided already then we get the list of possibilities that the current tile can be
-        # Otherwise that side has not been decided or doesn't exist which means the tile we are currently looking at can be any sprite
-        if right_tile != None and right_tile.decided == True:
-            right_possibilities = tilemap.spritemap.sprites[right_tile.sprite].left
-        else:
-            right_possibilities = range(0, tilemap.spritemap.sprite_count)
-
-        if left_tile != None and left_tile.decided == True:
-            left_possibilities = tilemap.spritemap.sprites[left_tile.sprite].right
-        else:
-            left_possibilities = range(0, tilemap.spritemap.sprite_count)
-
-        if up_tile != None and up_tile.decided == True:
-            up_possibilities = tilemap.spritemap.sprites[up_tile.sprite].down
-        else:
-            up_possibilities = range(0, tilemap.spritemap.sprite_count)
-
-        if down_tile != None and down_tile.decided == True:
-            down_possibilities = tilemap.spritemap.sprites[down_tile.sprite].up
-        else:
-            down_possibilities = range(0, tilemap.spritemap.sprite_count)
-
-        # We then get the intersection of all the sides possibilities.
-        # Eg.  if the right side can have sprites [0, 1, 2] but the left side will only allow sprites [0, 2]
-        #      we return the intersection of these two sets [0, 2]
-        possible_placements_tile = list(set(right_possibilities) & set(
-            left_possibilities) & set(up_possibilities) & set(down_possibilities))
-
-        # Finally only add this tile's possible sprites to the possible_placements list if it has at least one possible sprite
-        if len(possible_placements_tile) > 0:
-            possible_placements.append([tile, possible_placements_tile])
+        tile_possibilities = get_tile_possibilities(tilemap, tile)
+        if tile_possibilities != None:
+            possible_placements.append(tile_possibilities)
 
     return possible_placements
 
+def get_tile_possibilities (tilemap, tile):
+    # Store each side in temporary variables
+    right_tile = tilemap.get_tile(tile.x+1, tile.y)
+    left_tile = tilemap.get_tile(tile.x-1, tile.y)
+    up_tile = tilemap.get_tile(tile.x, tile.y+1)
+    down_tile = tilemap.get_tile(tile.x, tile.y-1)
+
+    # Check each side to see if the it has been decided
+    # If said side has been decided already then we get the list of possibilities that the current tile can be
+    # Otherwise that side has not been decided or doesn't exist which means the tile we are currently looking at can be any sprite
+    if right_tile != None and right_tile.decided == True:
+        right_possibilities = tilemap.spritemap.sprites[right_tile.sprite].left
+    else:
+        right_possibilities = range(0, tilemap.spritemap.sprite_count)
+
+    if left_tile != None and left_tile.decided == True:
+        left_possibilities = tilemap.spritemap.sprites[left_tile.sprite].right
+    else:
+        left_possibilities = range(0, tilemap.spritemap.sprite_count)
+
+    if up_tile != None and up_tile.decided == True:
+        up_possibilities = tilemap.spritemap.sprites[up_tile.sprite].down
+    else:
+        up_possibilities = range(0, tilemap.spritemap.sprite_count)
+
+    if down_tile != None and down_tile.decided == True:
+        down_possibilities = tilemap.spritemap.sprites[down_tile.sprite].up
+    else:
+        down_possibilities = range(0, tilemap.spritemap.sprite_count)
+
+    # We then get the intersection of all the sides possibilities.
+    # Eg.  if the right side can have sprites [0, 1, 2] but the left side will only allow sprites [0, 2]
+    #      we return the intersection of these two sets [0, 2]
+    possible_placements_tile = list(set(right_possibilities) & set(
+        left_possibilities) & set(up_possibilities) & set(down_possibilities))
+
+    # Finally only add this tile's possible sprites to the possible_placements list if it has at least one possible sprite
+    if len(possible_placements_tile) > 0:
+        return [tile, possible_placements_tile]
+    else:
+        return None
 
 def set_tile_neighbors_undecided(tilemap, tile):
     # Loop through neightbors or tile and set them to be undecided
@@ -104,7 +112,7 @@ def set_tile_neighbors_undecided(tilemap, tile):
                 temp_tile.decided = False
 
 
-def generate_tilemap(size, spritemap):
+def generate_tilemap(size, spritemap, canvas):
     tilemap = TileMap(size, spritemap)
     # Continue placing tiles as long as there undecided tiles left on the tilemap
     while len(get_decided(False, tilemap.tiles)) != 0:
@@ -119,11 +127,15 @@ def generate_tilemap(size, spritemap):
             # Place the tile's data into the tilemap
             possible[tile_chosen][0].sprite = sprite_chosen
             possible[tile_chosen][0].decided = True
+
+            # Put sprite onto the canvas
+            app.display_tile(
+                canvas, tilemap, possible[tile_chosen][0].x, possible[tile_chosen][0].y)
+            canvas.update()
         else:
             # otherwise we select a random undecided tile and set its neighbors to undecided
             undecided_tiles = get_decided(False, tilemap.tiles)
             undecided_index = random.randint(0, len(undecided_tiles))-1
             set_tile_neighbors_undecided(
                 tilemap, undecided_tiles[undecided_index])
-
     return tilemap
