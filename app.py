@@ -7,13 +7,13 @@ import math
 # VARIABLES TO EDIT (In the future these will be GUI options)
 
 # Number of tiles
-grid_count = 30
+grid_count = 10
 
 canvas_size = 800
 canvas_border_size = 0
 
 # Spritemap info
-sprites_filepath = 'spritemap/0/'
+sprites_filepath = 'spritemap/2/'
 sprites_count = 37
 
 # Other helpful variables to have stored (DO NOT EDIT)
