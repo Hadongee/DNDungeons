@@ -6,7 +6,7 @@ import math
 
 # VARIABLES TO EDIT (In the future these will be GUI options)
 # Number of tiles
-grid_count = 100
+grid_count = 20
 
 canvas_size = 800
 canvas_border_size = 0
@@ -101,7 +101,7 @@ def display_tile(canvas, tilemap, x, y):
     canvas.create_image(x*grid_size+2+grid_size/2,
                         y*grid_size+2+grid_size/2,
                         image=tilemap.spritemap.sprites[tilemap.tiles[y * grid_count + x].sprite].photoimg,
-                        tags="tilemap_image"
+                        tags=["tilemap_image", ("tile(" + str(x) + "," + str(y) + ")")]
                         )
 
 if __name__ == "__main__":

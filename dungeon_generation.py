@@ -103,7 +103,7 @@ def get_tile_possibilities (tilemap, tile):
     else:
         return None
 
-def set_tile_neighbors_undecided(tilemap, tile):
+def set_tile_neighbors_undecided(tilemap, tile, canvas):
     # Loop through neightbors or tile and set them to be undecided
     for x in range(-1, 2):
         for y in range(-1, 2):
@@ -111,8 +111,8 @@ def set_tile_neighbors_undecided(tilemap, tile):
                 temp_tile = tilemap.get_tile(tile.x + x, tile.y + y)
                 if temp_tile != None:
                     temp_tile.decided = False
-                    if hasattr(temp_tile, "photoimg"):
-                        temp_tile.photoimg = None
+                canvas.delete(("tile(" + str(tile.x + x) + "," + str(tile.y + y) + ")"))
+                
 
 
 def generate_tilemap(size, spritemap, canvas):
@@ -145,7 +145,7 @@ def generate_tilemap(size, spritemap, canvas):
             canvas.update()
         else:
             # otherwise we select a random undecided tile and set its neighbors to undecided
-            set_tile_neighbors_undecided(tilemap, undecided[tile_chosen])
+            set_tile_neighbors_undecided(tilemap, undecided[tile_chosen], canvas)
 
         # Recalculate the undecided array
         undecided = get_decided(False, tilemap.tiles)
