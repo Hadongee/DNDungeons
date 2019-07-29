@@ -107,35 +107,47 @@ def set_tile_neighbors_undecided(tilemap, tile):
     # Loop through neightbors or tile and set them to be undecided
     for x in range(-1, 2):
         for y in range(-1, 2):
-            temp_tile = tilemap.get_tile(tile.x + x, tile.y + y)
-            if temp_tile != None:
-                temp_tile.decided = False
+            if abs(x) != abs(y):
+                temp_tile = tilemap.get_tile(tile.x + x, tile.y + y)
+                if temp_tile != None:
+                    temp_tile.decided = False
+                    if hasattr(temp_tile, "photoimg"):
+                        temp_tile.photoimg = None
 
 
 def generate_tilemap(size, spritemap, canvas):
+    canvas.delete("tilemap_image")
+
     tilemap = TileMap(size, spritemap)
-    # Continue placing tiles as long as there undecided tiles left on the tilemap
-    while len(get_decided(False, tilemap.tiles)) != 0:
-        # Check if a valid tile can be placed
-        possible = get_possible_placements(tilemap)
-        if len(possible) > 0:
-            # If it can select a random one
-            tile_chosen = random.randint(0, len(possible))-1
-            sprite_index = random.randint(0, len(possible[tile_chosen][1]))-1
-            sprite_chosen = possible[tile_chosen][1][sprite_index]
+
+    # Get all undecided tiles
+    undecided = get_decided(False, tilemap.tiles)
+
+    # Keep going as long as there are undecided tiles
+    while len(undecided) > 0:
+        # Index of the chosen tile in the undecided list
+        tile_chosen = random.randint(0, len(undecided))-1
+        possible = get_tile_possibilities(tilemap, undecided[tile_chosen])
+
+        # If there are possible sprites that can be placed at the chosen tile's position
+        if possible != None:
+            # Choose a random possible sprite
+            sprite_index = random.randint(0, len(possible[1]))-1
+            sprite_chosen = possible[1][sprite_index]
 
             # Place the tile's data into the tilemap
-            possible[tile_chosen][0].sprite = sprite_chosen
-            possible[tile_chosen][0].decided = True
+            possible[0].sprite = sprite_chosen
+            possible[0].decided = True
 
             # Put sprite onto the canvas
             app.display_tile(
-                canvas, tilemap, possible[tile_chosen][0].x, possible[tile_chosen][0].y)
+                canvas, tilemap, possible[0].x, possible[0].y)
             canvas.update()
         else:
             # otherwise we select a random undecided tile and set its neighbors to undecided
-            undecided_tiles = get_decided(False, tilemap.tiles)
-            undecided_index = random.randint(0, len(undecided_tiles))-1
-            set_tile_neighbors_undecided(
-                tilemap, undecided_tiles[undecided_index])
+            set_tile_neighbors_undecided(tilemap, undecided[tile_chosen])
+
+        # Recalculate the undecided array
+        undecided = get_decided(False, tilemap.tiles)
+            
     return tilemap

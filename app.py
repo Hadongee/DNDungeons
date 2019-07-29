@@ -6,7 +6,7 @@ import math
 
 # VARIABLES TO EDIT (In the future these will be GUI options)
 # Number of tiles
-grid_count = 10
+grid_count = 100
 
 canvas_size = 800
 canvas_border_size = 0
@@ -92,15 +92,16 @@ def display_tile(canvas, tilemap, x, y):
     # Resize the sprite to the grid size
     image = image.resize(
         (math.ceil(grid_size), math.ceil(grid_size)), Image.NEAREST)
-    # Create a copy of the PhotoImage on the tile so that it does not get garbage collected. Without this the image will not show on the canvas
-    tilemap.tiles[y * grid_count +
-                  x].photoimg = ImageTk.PhotoImage(image)
+    # Create a copy of the PhotoImage on the sprite so that it does not get garbage collected. Without this the image will not show on the canvas
+    # We have to do this here instead of at the creation of the sprite because it cannot be instantiated too soon after getting the image
+    if not hasattr(tilemap.spritemap.sprites[tilemap.tiles[y * grid_count + x].sprite], "photoimg"):
+        tilemap.spritemap.sprites[tilemap.tiles[y * grid_count + x].sprite].photoimg = ImageTk.PhotoImage(image)
 
     # Place the image onto the canvas
     canvas.create_image(x*grid_size+2+grid_size/2,
                         y*grid_size+2+grid_size/2,
-                        image=tilemap.tiles[y *
-                                            grid_count + x].photoimg
+                        image=tilemap.spritemap.sprites[tilemap.tiles[y * grid_count + x].sprite].photoimg,
+                        tags="tilemap_image"
                         )
 
 if __name__ == "__main__":
