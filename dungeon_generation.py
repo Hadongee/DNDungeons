@@ -3,6 +3,8 @@ import random
 
 
 class Tile:
+    # Class to store which sprite is held at a location on the tilemap specified by (x, y)
+    # Also stores a decided variable which is used when generating the tilemap
     def __init__(self, x, y):
         self.x = x
         self.y = y
@@ -11,17 +13,22 @@ class Tile:
 
 
 class TileMap:
+    # Tilemap class to store a list of tiles, this structure hold the data about a DNDUNGEON map
     def __init__(self, tile_count, spritemap):
         self.width = tile_count
         self.height = tile_count
         self.tiles = list(())
+        # Spritemap defines the set of sprites that the tilemap is made from
         self.spritemap = spritemap
 
+        # Add a grid of blank tiles
         for y in range(tile_count):
             for x in range(tile_count):
                 self.tiles.append(Tile(x, y))
 
+    # Get the tile at position (x, y)
     def get_tile(self, x, y):
+        # Check to make sure the tile is valid
         if(x < self.width and x >= 0 and y < self.width and y >= 0):
             return self.tiles[y * self.width + x]
         else:
@@ -29,6 +36,7 @@ class TileMap:
 
 
 def get_decided(value, tiles):
+    # Gets all tiles in a list with a decided value that is the same as value
     output = list(())
 
     for tile in tiles:
@@ -39,15 +47,21 @@ def get_decided(value, tiles):
 
 
 def get_possible_placements(tilemap):
+    # List to store every possible sprite placement that could occur
+    # Elements take the form of [<Tile>, <List of sprite indexes that can go on that tile>]
     possible_placements = list(())
 
+    # Get every undecided tile
     for tile in get_decided(False, tilemap.tiles):
-        # Check each side
+        # Store each side in temporary variables
         right_tile = tilemap.get_tile(tile.x+1, tile.y)
         left_tile = tilemap.get_tile(tile.x-1, tile.y)
         up_tile = tilemap.get_tile(tile.x, tile.y+1)
         down_tile = tilemap.get_tile(tile.x, tile.y-1)
 
+        # Check each side to see if the it has been decided
+        # If said side has been decided already then we get the list of possibilities that the current tile can be
+        # Otherwise that side has not been decided or doesn't exist which means the tile we are currently looking at can be any sprite
         if right_tile != None and right_tile.decided == True:
             right_possibilities = tilemap.spritemap.sprites[right_tile.sprite].left
         else:
@@ -68,9 +82,13 @@ def get_possible_placements(tilemap):
         else:
             down_possibilities = range(0, tilemap.spritemap.sprite_count)
 
+        # We then get the intersection of all the sides possibilities.
+        # Eg.  if the right side can have sprites [0, 1, 2] but the left side will only allow sprites [0, 2]
+        #      we return the intersection of these two sets [0, 2]
         possible_placements_tile = list(set(right_possibilities) & set(
             left_possibilities) & set(up_possibilities) & set(down_possibilities))
 
+        # Finally only add this tile's possible sprites to the possible_placements list if it has at least one possible sprite
         if len(possible_placements_tile) > 0:
             possible_placements.append([tile, possible_placements_tile])
 
@@ -78,6 +96,7 @@ def get_possible_placements(tilemap):
 
 
 def set_tile_neighbors_undecided(tilemap, tile):
+    # Loop through neightbors or tile and set them to be undecided
     for x in range(-1, 2):
         for y in range(-1, 2):
             temp_tile = tilemap.get_tile(tile.x + x, tile.y + y)
@@ -87,8 +106,9 @@ def set_tile_neighbors_undecided(tilemap, tile):
 
 def generate_tilemap(size, spritemap):
     tilemap = TileMap(size, spritemap)
+    # Continue placing tiles as long as there undecided tiles left on the tilemap
     while len(get_decided(False, tilemap.tiles)) != 0:
-        # Check if valid tile can be placed
+        # Check if a valid tile can be placed
         possible = get_possible_placements(tilemap)
         if len(possible) > 0:
             # If it can select a random one
@@ -96,11 +116,11 @@ def generate_tilemap(size, spritemap):
             sprite_index = random.randint(0, len(possible[tile_chosen][1]))-1
             sprite_chosen = possible[tile_chosen][1][sprite_index]
 
-            # place it
+            # Place the tile's data into the tilemap
             possible[tile_chosen][0].sprite = sprite_chosen
             possible[tile_chosen][0].decided = True
-        # OTHERWISE we select a random undecided tile and set its neighbors to undecided
         else:
+            # otherwise we select a random undecided tile and set its neighbors to undecided
             undecided_tiles = get_decided(False, tilemap.tiles)
             undecided_index = random.randint(0, len(undecided_tiles))-1
             set_tile_neighbors_undecided(

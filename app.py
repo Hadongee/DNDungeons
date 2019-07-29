@@ -4,12 +4,21 @@ import dungeon_generation
 from PIL import Image, ImageTk
 import math
 
+# VARIABLES TO EDIT (In the future these will be GUI options)
+
+# Number of tiles
 grid_count = 30
+
 canvas_size = 800
 canvas_border_size = 0
-grid_size = (canvas_size-1)/grid_count
 
-spritemap = spritemap.SpriteMap('spritemap/0/', 37)
+# Spritemap info
+sprites_filepath = 'spritemap/0/'
+sprites_count = 37
+
+# Other helpful variables to have stored (DO NOT EDIT)
+grid_size = (canvas_size-1)/grid_count
+spritemap = spritemap.SpriteMap(sprites_filepath, sprites_count)
 tilemap = None
 
 
@@ -32,6 +41,7 @@ def main():
     canvas.pack()
     canvas.update()
 
+    # Button to generate a new tilemap
     generate_button = Button(root, text="Generate",
                              command=lambda: generate_map(canvas))
     generate_button.pack()
@@ -40,11 +50,9 @@ def main():
 
     mainloop()
 
-# Initialize the grid lines
-
 
 def init_grid(canvas):
-    print("Initializing Grid...")
+    # Initialize the grid lines
 
     # Instantiate the underlying grid lines
     for y in range(grid_count):
@@ -55,36 +63,37 @@ def init_grid(canvas):
                                     (y+1)*grid_size+2,
                                     outline="black", width=1, tags="gridline")
 
-# Call this after you add anything to the canvas to raise the grid lines back to the top
-
 
 def reset_grid(canvas):
+    # Call this after you add anything to the canvas to raise the grid lines back to the top
     canvas.tag_raise("gridline")
-
-# Generates a tilemap from the spritemap
 
 
 def generate_map(canvas):
-    print("Generating map...")
+    # Generates a tilemap from the spritemap
     global tilemap
     tilemap = dungeon_generation.generate_tilemap(grid_count, spritemap)
     display_tilemap(canvas, tilemap)
     reset_grid(canvas)
 
-# Displays the tilemap on the canvas
-
 
 def display_tilemap(canvas, tilemap):
-    print("Displaying map...")
+    # Displays the tilemap on the canvas
+
+    # Loop through every tile
     for y in range(grid_count):
         for x in range(grid_count):
+            # Open the sprite we are going to load to the canvas
             image = Image.open(
                 tilemap.spritemap.sprites[tilemap.tiles[y * grid_count + x].sprite].filepath)
+            # Resize the sprite to the grid size
             image = image.resize(
                 (math.ceil(grid_size), math.ceil(grid_size)), Image.NEAREST)
+            # Create a copy of the PhotoImage on the tile so that it does not get garbage collected. Without this the image will not show on the canvas
             tilemap.tiles[y * grid_count +
                           x].photoimg = ImageTk.PhotoImage(image)
 
+            # Place the image onto the canvas
             canvas.create_image(x*grid_size+2+grid_size/2,
                                 y*grid_size+2+grid_size/2,
                                 image=tilemap.tiles[y *
