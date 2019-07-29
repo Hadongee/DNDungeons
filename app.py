@@ -4,7 +4,7 @@ import dungeon_generation
 from PIL import Image, ImageTk
 import math
 
-grid_count = 20
+grid_count = 30
 canvas_size = 800
 canvas_border_size = 0
 grid_size = (canvas_size-1)/grid_count
