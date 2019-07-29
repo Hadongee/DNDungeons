@@ -1,7 +1,10 @@
 from PIL import Image, ImageTk
 
+# test comment
+
+
 class Sprite:
-    def __init__ (self, index, filepath):
+    def __init__(self, index, filepath):
         self.index = index
         self.filepath = filepath
         self.image = Image.open(filepath)
@@ -12,7 +15,7 @@ class Sprite:
         self.up = list(())
         self.down = list(())
 
-    def compare (self, other):
+    def compare(self, other):
         self_pixels = self.image.load()
         other_pixels = other.image.load()
 
@@ -22,7 +25,7 @@ class Sprite:
                 break
         else:
             self.left.append(other.index)
-        
+
         for i in range(self.height):
             if self_pixels[self.width-1, i] != other_pixels[0, i]:
                 break
@@ -41,8 +44,9 @@ class Sprite:
         else:
             self.down.append(other.index)
 
+
 class SpriteMap:
-    def __init__ (self, filepath, sprite_count):
+    def __init__(self, filepath, sprite_count):
         self.sprites = list(())
         self.sprite_count = sprite_count
         for i in range(sprite_count):
