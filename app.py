@@ -41,19 +41,27 @@ def main():
     canvas.update()
 
     # checkbox for grid overlay
-    grid_bool = BooleanVar(value=1)
+    grid_bool = BooleanVar(value=True)
     grid_button = Checkbutton(
-        root, text="Grid Overlay", variable=grid_bool, onvalue=True, offvalue=False)
+        root, text="Grid Overlay", command=lambda: update_grid(grid_bool, canvas), variable=grid_bool, onvalue=True, offvalue=False)
     grid_button.pack()
 
     # Button to generate a new tilemap
     generate_button = Button(root, text="Generate",
-                             command=lambda: generate_map(canvas, grid_bool))
+                             command=lambda: generate_map(canvas))
     generate_button.pack()
 
     init_grid(canvas)
 
     mainloop()
+
+
+def update_grid(grid_bool, canvas):
+    # deletes or (re)initialises the grid depending on the value of grid_bool
+    if grid_bool.get() == True:
+        init_grid(canvas)
+    if grid_bool.get() == False:
+        canvas.delete("gridline")
 
 
 def init_grid(canvas):
@@ -74,13 +82,12 @@ def reset_grid(canvas):
     canvas.tag_raise("gridline")
 
 
-def generate_map(canvas, grid_bool):
+def generate_map(canvas):
     # Generates a tilemap from the spritemap
     global tilemap
     tilemap = dungeon_generation.generate_tilemap(
         grid_count, spritemap, canvas)
-    if grid_bool:
-        reset_grid(canvas)
+    reset_grid(canvas)
 
 
 def display_tilemap(canvas, tilemap):
