@@ -29,12 +29,12 @@ def main():
     root.geometry("920x880")
     root.winfo_toplevel().title("DNDungeonWorldGenerator")
 
-    App(root)
+    Frames(root)
 
     mainloop()
 
 
-class App:
+class Frames:
     def __init__(self,master):
         fm_top = Frame(master)
         
