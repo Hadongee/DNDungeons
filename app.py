@@ -26,37 +26,52 @@ def main():
 
     # Application Setup
     root = Tk()
-    root.geometry("820x920")
+    root.geometry("920x880")
     root.winfo_toplevel().title("DNDungeonWorldGenerator")
 
-    # Title label
-    title = Label(root, anchor=CENTER, text="DNDungeonWorldGenerator",
-                  pady=5, font=("Helvetica", 30))
-    title.pack()
-
-    # Map canvas
-    canvas = Canvas(root, height=canvas_size, width=canvas_size,
-                    bg="white", relief="solid", borderwidth=canvas_border_size)
-    canvas.pack()
-    canvas.update()
-
-    # checkbox for grid overlay
-    grid_bool = BooleanVar(value=True)
-    grid_button = Checkbutton(
-        root, text="Grid Overlay", command=lambda: update_grid(grid_bool, canvas), variable=grid_bool, onvalue=True, offvalue=False)
-    grid_button.pack()
-
-    # Button to generate a new tilemap
-    generate_button = Button(root, text="Generate",
-                             command=lambda: generate_map(canvas))
-    generate_button.pack()
-
-    init_grid(canvas)
+    App(root)
 
     mainloop()
 
 
-def update_grid(grid_bool, canvas):
+class App:
+    def __init__(self,master):
+        fm_top = Frame(master)
+        
+        # Title label
+        title = Label(fm_top, anchor=CENTER, text="DNDungeonWorldGenerator",
+                      pady=5, font=("Helvetica", 30))
+        title.pack()
+
+        fm_lft = Frame(master)
+
+        # Map canvas
+        canvas = Canvas(fm_lft, height=canvas_size, width=canvas_size,
+                        bg="white", relief="solid", borderwidth=canvas_border_size)
+        canvas.pack()
+
+        init_grid(canvas)
+        #canvas.update()
+        
+        fm_rgt = Frame(master)
+
+        # checkbox for grid overlay
+        grid_bool = BooleanVar(value=False)
+        grid_button = Checkbutton(fm_rgt, text="Grid Overlay", command=lambda: grid_on_off(grid_bool, canvas),
+                                  variable=grid_bool, onvalue=True, offvalue=False)
+        grid_button.pack()
+
+        # Button to generate a new tilemap
+        generate_button = Button(fm_rgt, text="Generate",
+                                 command=lambda: generate_map(canvas))
+        generate_button.pack()
+
+        fm_top.pack(side=TOP)
+        fm_lft.pack(side=LEFT)
+        fm_rgt.pack(side=RIGHT) 
+
+
+def grid_on_off(grid_bool, canvas):
     # deletes or (re)initialises the grid depending on the value of grid_bool
     if grid_bool.get() == True:
         init_grid(canvas)
