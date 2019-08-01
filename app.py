@@ -20,7 +20,6 @@ grid_size = (canvas_size-1)/grid_count
 spritemap = spritemap.SpriteMap(sprites_filepath, sprites_count)
 tilemap = None
 
-
 def main():
     print("Running...")
 
@@ -32,7 +31,6 @@ def main():
     Init_Frames(root)
 
     mainloop()
-
 
 class Init_Frames:
     def __init__(self,master):

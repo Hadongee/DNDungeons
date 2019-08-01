@@ -1,5 +1,7 @@
 from PIL import Image, ImageTk
+import pickle
 
+FILETYPE = ".sprm"
 
 class Sprite:
     # Sprite class for holding image filepath and sprite index in a spritemap
@@ -64,3 +66,12 @@ class SpriteMap:
                 # If the comparison is not between the same sprite then compare the other sprite to the current sprite as well
                 if i != j:
                     self.sprites[j].compare(self.sprites[i])
+
+def save_spritemap(spritemap, filename):
+    with open(filename + FILETYPE, "wb") as spritemap_file:
+        pickle.dump(spritemap, spritemap_file)
+
+def load_spritemap(filename):
+    with open(filename + FILETYPE, "rb") as spritemap_file:
+        spritemap = pickle.load(spritemap_file)
+        return spritemap
