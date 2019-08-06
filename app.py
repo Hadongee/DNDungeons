@@ -1,6 +1,7 @@
 from tkinter import *  # pylint: disable=unused-wildcard-import
 from PIL import Image, ImageTk
 import math
+import dungeon_generation
 
 # VARIABLES TO EDIT (In the future these will be GUI options)
 # Number of tiles
@@ -12,6 +13,8 @@ canvas_border_size = 0
 # Other helpful variables to have stored (DO NOT EDIT)
 grid_size = (canvas_size-1)/grid_count
 
+frames = None
+
 def main():
     print("Running...")
 
@@ -20,44 +23,49 @@ def main():
     root.geometry("920x880")
     root.winfo_toplevel().title("DNDungeonWorldGenerator")
 
-    Init_Frames(root)
+    global frames
+    frames = Init_Frames(root)
 
     mainloop()
 
 class Init_Frames:
     def __init__(self,master):
-        fm_top = Frame(master)
+        self.fm_top = Frame(master)
         
         # Title label
-        title = Label(fm_top, anchor=CENTER, text="DNDungeonWorldGenerator",
+        self.title = Label(self.fm_top, anchor=CENTER, text="DNDungeonWorldGenerator",
                       pady=5, font=("Helvetica", 30))
-        title.pack()
+        self.title.pack()
 
-        fm_lft = Frame(master)
+        self.fm_lft = Frame(master)
 
         # Map canvas
-        canvas = Canvas(fm_lft, height=canvas_size, width=canvas_size,
+        self.canvas = Canvas(self.fm_lft, height=canvas_size, width=canvas_size,
                         bg="white", relief="solid", borderwidth=canvas_border_size)
-        canvas.pack()
+        self.canvas.pack()
+        init_grid(self.canvas)
 
-        init_grid(canvas)
-        
-        fm_rgt = Frame(master)
+        self.fm_rgt = Frame(master)
 
         # checkbox for grid overlay
-        grid_bool = BooleanVar(value=False)
-        grid_button = Checkbutton(fm_rgt, text="Grid Overlay", command=lambda: grid_on_off(grid_bool, canvas),
-                                  variable=grid_bool, onvalue=True, offvalue=False)
-        grid_button.pack()
+        self.grid_bool = BooleanVar(value=False)
+        self.grid_button = Checkbutton(self.fm_rgt, text="Grid Overlay", command=lambda: grid_on_off(self.grid_bool, self.canvas),
+                                  variable=self.grid_bool, onvalue=True, offvalue=False)
+        self.grid_button.pack()
 
         # Button to generate a new tilemap
-        generate_button = Button(fm_rgt, text="Generate")
-        generate_button.pack()
+        self.generate_button = Button(self.fm_rgt, text="Generate", command= lambda: generate_dungeon(10, 1000, 2, 10))
+        self.generate_button.pack()
 
-        fm_top.pack(side=TOP)
-        fm_lft.pack(side=LEFT)
-        fm_rgt.pack(side=RIGHT) 
+        self.fm_top.pack(side=TOP)
+        self.fm_lft.pack(side=LEFT)
+        self.fm_rgt.pack(side=RIGHT) 
 
+def generate_dungeon (rooms, trials, min_room_size, max_room_size):
+    # generates the dungeon tilemap, many different functions can be added for generating overworld tilemaps and such
+    frames.canvas.delete("tilemap")
+    tilemap = dungeon_generation.generate(grid_count, grid_count, rooms, trials, min_room_size, max_room_size)
+    show_tilemap(frames.canvas, tilemap)
 
 def grid_on_off(grid_bool, canvas):
     # deletes or (re)initialises the grid depending on the value of grid_bool
@@ -66,6 +74,15 @@ def grid_on_off(grid_bool, canvas):
     if grid_bool.get() == False:
         canvas.delete("gridline")
 
+def show_tilemap (canvas, tilemap):
+    for y in range(tilemap.height):
+        for x in range(tilemap.width):
+            if tilemap.tiles[y * tilemap.width + x].solid:
+                canvas.create_rectangle(x*grid_size+2,
+                                        y*grid_size+2,
+                                        (x+1)*grid_size+2,
+                                        (y+1)*grid_size+2,
+                                        outline="black", width=1, tags="tilemap", fill="black")
 
 def init_grid(canvas):
     # Instantiate the underlying grid lines
