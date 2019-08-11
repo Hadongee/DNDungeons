@@ -29,6 +29,7 @@ def main():
     mainloop()
 
 class Init_Frames:
+    # create tkinter elements, place them in frames for origanisation and load them all into the window
     def __init__(self,master):
         self.fm_top = Frame(master)
         
