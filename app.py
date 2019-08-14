@@ -5,7 +5,7 @@ import dungeon_generation
 
 # VARIABLES TO EDIT (In the future these will be GUI options)
 # Number of tiles
-grid_count = 20
+grid_count = 100
 
 canvas_size = 800
 canvas_border_size = 0
@@ -64,8 +64,11 @@ class Init_Frames:
 def generate_dungeon (rooms, trials, min_room_size, max_room_size):
     # generates the dungeon tilemap, many different functions can be added for generating overworld tilemaps and such
     frames.canvas.delete("tilemap")
-    tilemap = dungeon_generation.generate(grid_count, grid_count, rooms, trials, min_room_size, max_room_size)
-    show_tilemap(frames.canvas, tilemap)
+
+    # Generate tilemap and show it on canvas here
+
+    #tilemap = dungeon_generation.generate(grid_count, grid_count, rooms, trials, min_room_size, max_room_size)
+    #show_tilemap(frames.canvas, tilemap)
 
 def grid_on_off(grid_bool, canvas):
     # deletes or (re)initialises the grid depending on the value of grid_bool
