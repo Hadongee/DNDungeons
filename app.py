@@ -1,4 +1,4 @@
-from tkinter import *  # pylint: disable=unused-wildcard-import
+from tkinter import * # pylint: disable=unused-wildcard-import
 from PIL import Image, ImageTk
 import math
 import dungeon_generation
@@ -20,7 +20,7 @@ def main():
 
     # Application Setup
     root = Tk()
-    root.geometry("920x880")
+    root.geometry("1000x880")
     root.winfo_toplevel().title("DNDungeonWorldGenerator")
 
     global frames
@@ -48,21 +48,57 @@ class Init_Frames:
 
         self.fm_rgt = Frame(master)
 
+        # entry boxes - holy fuck this code sucks immensely
+        # this can be done cleaner using an array of results
+        self.lbl_a = Label(self.fm_rgt, text="Number of Rooms")
+        self.ent_a = Entry(self.fm_rgt)
+        self.lbl_b = Label(self.fm_rgt, text="Minimum Room Size")
+        self.ent_b = Entry(self.fm_rgt)
+        self.lbl_c = Label(self.fm_rgt, text="Maximum Room Size")
+        self.ent_c = Entry(self.fm_rgt)
+        self.lbl_d = Label(self.fm_rgt, text="Maximum Connections")
+        self.ent_d = Entry(self.fm_rgt)
+        self.lbl_e = Label(self.fm_rgt, text="Maximum Trials")
+        self.ent_e = Entry(self.fm_rgt)
+
+        self.ent_a.insert(END,'10')
+        self.ent_b.insert(END,'2')
+        self.ent_c.insert(END,'10')
+        self.ent_d.insert(END,'3')
+        self.ent_e.insert(END,'100')
+
+        self.lbl_a.pack()
+        self.ent_a.pack()
+        self.lbl_b.pack()
+        self.ent_b.pack()
+        self.lbl_c.pack()
+        self.ent_c.pack()
+        self.lbl_d.pack()
+        self.ent_d.pack()
+        self.lbl_e.pack()
+        self.ent_e.pack()
+
+        self.no_rooms = self.ent_a.get()
+        self.min_size = self.ent_b.get()
+        self.max_size = self.ent_c.get()
+        self.max_conc = self.ent_d.get()
+        self.max_tril = self.ent_e.get()
+
         # checkbox for grid overlay
-        self.grid_bool = BooleanVar(value=False)
+        self.grid_bool = BooleanVar(value=True)
         self.grid_button = Checkbutton(self.fm_rgt, text="Grid Overlay", command=lambda: grid_on_off(self.grid_bool, self.canvas),
                                   variable=self.grid_bool, onvalue=True, offvalue=False)
         self.grid_button.pack()
 
         # Button to generate a new tilemap
-        self.generate_button = Button(self.fm_rgt, text="Generate", command= lambda: generate_dungeon(10, 1000, 2, 10))
+        self.generate_button = Button(self.fm_rgt, text="Generate", command= lambda: generate_dungeon(self.no_rooms, self.max_tril, self.min_size, self.max_size, self.max_conc))
         self.generate_button.pack()
 
         self.fm_top.pack(side=TOP)
-        self.fm_lft.pack(side=LEFT)
-        self.fm_rgt.pack(side=RIGHT) 
+        self.fm_lft.pack(side=LEFT,padx=15)
+        self.fm_rgt.pack(side=RIGHT,padx=15) 
 
-def generate_dungeon (rooms, trials, min_room_size, max_room_size):
+def generate_dungeon (rooms, trials, min_room_size, max_room_size, max_connections):
     # generates the dungeon tilemap, many different functions can be added for generating overworld tilemaps and such
     frames.canvas.delete("tilemap")
 
@@ -97,7 +133,6 @@ def init_grid(canvas):
                                     (x+1)*grid_size+2,
                                     (y+1)*grid_size+2,
                                     outline="black", width=1, tags="gridline")
-
 
 def reset_grid(canvas):
     # Call this after you add anything to the canvas to raise the grid lines back to the top
