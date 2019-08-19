@@ -101,6 +101,7 @@ class Init_Frames:
 def generate_dungeon (rooms, trials, min_room_size, max_room_size, max_connections):
     # generates the dungeon tilemap, many different functions can be added for generating overworld tilemaps and such
     frames.canvas.delete("tilemap")
+    nodes = generate_nodes(rooms, max_connections, trials)
 
     # Generate tilemap and show it on canvas here
 
